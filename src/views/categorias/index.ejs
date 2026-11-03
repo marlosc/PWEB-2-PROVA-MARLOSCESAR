@@ -1,6 +1,13 @@
-<%#
-  VIEW: listagem de categorias. Recebe { categorias }.
-  Mostre uma tabela com o nome de cada categoria e um link para criar uma nova.
-%>
 <h1>Categorias</h1>
-<!-- TODO: link "Nova Categoria" e a tabela com os nomes -->
+<p><a href="/categorias/nova">Nova Categoria</a></p>
+<table>
+  <thead><tr><th>ID</th><th>Nome</th></tr></thead>
+  <tbody>
+    <% categorias.forEach((categoria) => { %>
+      <tr>
+        <td>#<%= categoria.id %></td>
+        <td><%= categoria.nome %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
