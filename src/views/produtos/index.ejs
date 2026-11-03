@@ -1,8 +1,15 @@
-<%#
-  VIEW: listagem de produtos. Recebe { produtos }.
-  Mostre uma tabela com nome, preço e o NOME DA CATEGORIA de cada produto (o nome
-  da categoria vem do relacionamento — garanta que o repositório trouxe a categoria
-  junto). Inclua também um link para cadastrar um novo produto.
-%>
 <h1>Produtos</h1>
-<!-- TODO: link "Novo Produto" e a tabela (com a coluna Categoria) -->
+<p><a href="/produtos/novo">Novo Produto</a></p>
+<table>
+  <thead><tr><th>ID</th><th>Nome</th><th>Preço</th><th>Categoria</th></tr></thead>
+  <tbody>
+    <% produtos.forEach((produto) => { %>
+      <tr>
+        <td>#<%= produto.id %></td>
+        <td><%= produto.nome %></td>
+        <td>R$ <%= Number(produto.preco).toFixed(2).replace('.', ',') %></td>
+        <td><%= produto.categoria.nome %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
