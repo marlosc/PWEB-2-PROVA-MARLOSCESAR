@@ -1,7 +1,19 @@
-<%#
-  VIEW: formulário de categoria. Recebe { titulo, valores, erros }.
-  Monte um <form method="POST" action="/categorias"> com o campo nome (obrigatório),
-  reexibindo `valores` e mostrando a lista de `erros` quando houver.
-%>
 <h1><%= titulo %></h1>
-<!-- TODO: bloco de erros (se houver) e o formulário com o campo nome -->
+<% if (erros && erros.length) { %>
+  <div role="alert" class="alert alert-danger">
+    <ul>
+      <% erros.forEach((erro) => { %>
+        <li><%= erro %></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+<form method="POST" action="/categorias">
+  <div class="form-group">
+    <label for="nome">Nome da categoria</label>
+    <input id="nome" type="text" name="nome" required
+      value="<%= valores?.nome || '' %>">
+  </div>
+  <button type="submit">Cadastrar Categoria</button>
+  <a href="/categorias">Voltar</a>
+</form>
