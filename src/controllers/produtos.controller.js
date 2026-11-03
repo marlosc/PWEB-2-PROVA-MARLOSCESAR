@@ -1,17 +1,52 @@
-// CONTROLLER (SSR) de Produto — traduz HTTP <-> views (res.render + PRG).
-// O formulário de produto tem um <select> de categorias, então o método que
-// mostra o formulário precisa BUSCAR a lista de categorias e enviá-la à view
-// (e também ao reexibir o form quando a validação falhar).
-//
-// Ações:
-//   - index (GET /produtos)      -> listagem (mostrando a categoria de cada produto);
-//   - novo  (GET /produtos/novo) -> formulário vazio + lista de categorias;
-//   - criar (POST /produtos)     -> cria e redireciona; erro 4xx reexibe o form.
+import { AppError } from '../utils/appError.js';
+
 export class ProdutosController {
   constructor(produtosService, categoriasService) {
     this.service = produtosService;
-    this.categoriasService = categoriasService; // para montar o <select> de categorias
-    // Dica: "amarre" o this dos métodos usados como callback nas rotas.
+    this.categoriasService = categoriasService;
+    this.index = this.index.bind(this);
+    this.novo = this.novo.bind(this);
+    this.criar = this.criar.bind(this);
   }
-  // TODO: implemente index, novo, criar.
+
+  async index(req, res, next) {
+    try {
+      const produtos = await this.service.listar();
+      res.render('produtos/index', { titulo: 'Produtos', produtos });
+    } catch (erro) {
+      next(erro);
+    }
+  }
+
+  async novo(req, res, next) {
+    try {
+      const categorias = await this.categoriasService.listar();
+      res.render('produtos/form', {
+        titulo: 'Novo Produto', valores: {}, erros: [], categorias,
+      });
+    } catch (erro) {
+      next(erro);
+    }
+  }
+
+  async criar(req, res, next) {
+    try {
+      await this.service.criar(req.body);
+      req.flash('sucesso', 'Produto cadastrado com sucesso.');
+      res.redirect('/produtos');
+    } catch (erro) {
+      if (erro instanceof AppError && erro.status >= 400 && erro.status < 500) {
+        try {
+          const categorias = await this.categoriasService.listar();
+          return res.status(erro.status).render('produtos/form', {
+            titulo: 'Novo Produto', valores: req.body,
+            erros: [erro.message], categorias,
+          });
+        } catch (erroLista) {
+          return next(erroLista);
+        }
+      }
+      next(erro);
+    }
+  }
 }
